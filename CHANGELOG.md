@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file. See [conven
 - - -
 ## v0.6.0 - 2026-05-18
 #### Features
+- Renamed actions - (0fbeb4c) - R Vadai
+- simplified - (035bdfe) - R Vadai
+- chopping name - (d2903b0) - R Vadai
+- upgrade - (4e0b35d) - R Vadai
+#### Bug Fixes
+- action names - (4b27709) - R Vadai
+- repo-name - (d0d021f) - Rob Vadai
+- repo name - (b1f7f41) - R Vadai
+#### Miscellaneous Chores
+- (**version**) v0.6.0 [skip ci] - (fcd0613) - github-action
+
+- - -
+
+## v0.6.0 - 2026-05-18
+#### Features
 - simplified - (035bdfe) - R Vadai
 - chopping name - (d2903b0) - R Vadai
 - upgrade - (4e0b35d) - R Vadai
