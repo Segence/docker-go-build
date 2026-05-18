@@ -1,4 +1,4 @@
-name: release
+name: Release repository
 on:
   workflow_run:
     workflows:
