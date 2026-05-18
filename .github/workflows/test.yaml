@@ -20,7 +20,7 @@ jobs:
       with:
         dockerfile: ./${{ matrix.classifier }}/Dockerfile
     - name: Build an image from Dockerfile
-      run: docker build -t ${{ matrix.classifier }}:latest ./${{ matrix.classifier }}/Dockerfile
+      run: docker build --tag ${{ matrix.classifier }}:latest ./${{ matrix.classifier }}
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@v0.36.0
       with:
