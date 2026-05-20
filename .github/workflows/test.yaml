@@ -19,6 +19,17 @@ jobs:
       uses: hadolint/hadolint-action@v3.3.0
       with:
         dockerfile: ./${{ matrix.classifier }}/Dockerfile
+    - name: Build an image from Dockerfile
+      run: docker build --tag ${{ matrix.classifier }}:latest ./${{ matrix.classifier }}
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@v0.36.0
+      with:
+        image-ref: '${{ matrix.classifier }}:latest'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
     - name: Update Pull Request
       uses: actions/github-script@v9
       if: github.event_name == 'pull_request'
