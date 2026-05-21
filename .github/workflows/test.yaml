@@ -21,6 +21,15 @@ jobs:
         dockerfile: ./${{ matrix.classifier }}/Dockerfile
     - name: Build an image from Dockerfile
       run: docker build --tag ${{ matrix.classifier }}:latest ./${{ matrix.classifier }}
+    # - name: Run Trivy vulnerability scanner
+    #   uses: aquasecurity/trivy-action@v0.36.0
+    #   with:
+    #     image-ref: '${{ matrix.classifier }}:latest'
+    #     format: 'table'
+    #     exit-code: '1'
+    #     ignore-unfixed: true
+    #     vuln-type: 'os,library'
+    #     severity: 'CRITICAL,HIGH'
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@v0.36.0
       with:
@@ -31,10 +40,12 @@ jobs:
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
         output: 'trivy-results.sarif'
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v4
-      with:
-        sarif_file: 'trivy-results.sarif'
+    - name: Echo Trivy SARIF results
+      run: cat trivy-results.sarif
+    # - name: Upload Trivy scan results to GitHub Security tab
+    #   uses: github/codeql-action/upload-sarif@v4
+    #   with:
+    #     sarif_file: 'trivy-results.sarif'
     - name: Update Pull Request
       uses: actions/github-script@v9
       if: github.event_name == 'pull_request'
