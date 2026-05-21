@@ -25,11 +25,16 @@ jobs:
       uses: aquasecurity/trivy-action@v0.36.0
       with:
         image-ref: '${{ matrix.classifier }}:latest'
-        format: 'table'
+        format: 'sarif'
         exit-code: '1'
         ignore-unfixed: true
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
+        output: 'trivy-results.sarif'
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v4
+      with:
+        sarif_file: 'trivy-results.sarif'
     - name: Update Pull Request
       uses: actions/github-script@v9
       if: github.event_name == 'pull_request'
