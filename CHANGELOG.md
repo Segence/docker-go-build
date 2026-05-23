@@ -2,6 +2,34 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.7.0 - 2026-05-23
+#### Features
+- sbom - (d0a0b5a) - Rob Vadai
+- postal - (4384dc6) - R Vadai
+- fix - (82beb0e) - R Vadai
+- sbom - (366aa67) - R Vadai
+- sha - (66b6a55) - R Vadai
+- PR - (0c6b8c7) - R Vadai
+- README update - (1aff4dd) - R Vadai
+- sarif - (678c439) - R Vadai
+- trivy - (ba370c6) - R Vadai
+- Trivy - (9f2e986) - R Vadai
+#### Bug Fixes
+- not only on PR - (971917c) - R Vadai
+- had - (554768d) - R Vadai
+- dfg - (1c0c243) - R Vadai
+- no fail - (4fda667) - R Vadai
+- always - (9219f10) - R Vadai
+- grype - (630a090) - R Vadai
+- fix - (b3a3b3e) - R Vadai
+- wip - (93a8c89) - R Vadai
+- fixing - (34781d7) - R Vadai
+#### Miscellaneous Chores
+- upload - (caa6348) - R Vadai
+- echo - (b731128) - R Vadai
+
+- - -
+
 ## v0.6.0 - 2026-05-18
 #### Features
 - Renamed actions - (0fbeb4c) - R Vadai
