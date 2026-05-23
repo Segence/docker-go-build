@@ -13,57 +13,49 @@ jobs:
       matrix:
         classifier: [kafka]
     permissions:
-      security-events: write   # ← THIS is what you're missing
-      contents: read           # needed to check out code
-      actions: read            # needed by some codeql internals
+      security-events: write
+      contents: read
+      actions: read
       pull-requests: write
     steps:
     - uses: actions/checkout@v3
-    # - name: Lint Dockerfile
-    #   id: hadolint
-    #   uses: hadolint/hadolint-action@v3.3.0
-    #   with:
-    #     dockerfile: ./${{ matrix.classifier }}/Dockerfile
+    - name: Lint Dockerfile
+      id: hadolint
+      uses: hadolint/hadolint-action@v3.3.0
+      with:
+        dockerfile: ./${{ matrix.classifier }}/Dockerfile
     - name: Build an image from Dockerfile
-      run: docker build --tag ${{ matrix.classifier }}:${{ github.sha }} ./${{ matrix.classifier }}
-    # - name: Run Trivy vulnerability scanner
-    #   uses: aquasecurity/trivy-action@v0.36.0
-    #   with:
-    #     image-ref: '${{ matrix.classifier }}:${{ github.sha }}'
-    #     format: 'table'
-    #     exit-code: '1'
-    #     ignore-unfixed: true
-    #     vuln-type: 'os,library'
-    #     severity: 'CRITICAL,HIGH'
+      run: |
+        set -e
+        docker build --tag "${{ matrix.classifier }}:${{ github.sha }}" ./${{ matrix.classifier }}
+        docker scout sbom --format spdx "${{ matrix.classifier }}:${{ github.sha }}" > "${{ matrix.classifier }}:${{ github.sha }}-sbom.spdx.json"
     - name: Run Grype vulnerability scanner
       uses: anchore/scan-action@v7
       id: scan
       with:
-        image: '${{ matrix.classifier }}:${{ github.sha }}'
-        fail-build: false
+        sbom: "${{ matrix.classifier }}:${{ github.sha }}-sbom.spdx.json"
+        fail-build: true
         severity-cutoff: high
-    # - name: Echo Trivy SARIF results
-    #   run: cat trivy-results.sarif
     - name: Upload Grype scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v4
-      if: always()  # Upload results even if the scan fails
+      if: always()
       with:
         sarif_file: ${{ steps.scan.outputs.sarif }}
-    # - name: Update Pull Request
-    #   uses: actions/github-script@v9
-    #   if: github.event_name == 'pull_request'
-    #   with:
-    #     script: |
-    #       const output = `
-    #       #### Hadolint: \`${{ steps.hadolint.outcome }}\`
-    #       \`\`\`
-    #       ${process.env.HADOLINT_RESULTS}
-    #       \`\`\`
-    #       `;
+    - name: Update Pull Request
+      uses: actions/github-script@v9
+      if: github.event_name == 'pull_request'
+      with:
+        script: |
+          const output = `
+          #### Hadolint: \`${{ steps.hadolint.outcome }}\`
+          \`\`\`
+          ${process.env.HADOLINT_RESULTS}
+          \`\`\`
+          `;
 
-    #       github.rest.issues.createComment({
-    #         issue_number: context.issue.number,
-    #         owner: context.repo.owner,
-    #         repo: context.repo.repo,
-    #         body: output
-    #       })
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: output
+          })
