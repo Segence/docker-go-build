@@ -25,11 +25,11 @@ jobs:
     #   with:
     #     dockerfile: ./${{ matrix.classifier }}/Dockerfile
     - name: Build an image from Dockerfile
-      run: docker build --tag ${{ matrix.classifier }}:latest ./${{ matrix.classifier }}
+      run: docker build --tag ${{ matrix.classifier }}:${{ github.sha }} ./${{ matrix.classifier }}
     # - name: Run Trivy vulnerability scanner
     #   uses: aquasecurity/trivy-action@v0.36.0
     #   with:
-    #     image-ref: '${{ matrix.classifier }}:latest'
+    #     image-ref: '${{ matrix.classifier }}:${{ github.sha }}'
     #     format: 'table'
     #     exit-code: '1'
     #     ignore-unfixed: true
@@ -39,7 +39,7 @@ jobs:
       uses: anchore/scan-action@v7
       id: scan
       with:
-        image: '${{ matrix.classifier }}:latest'
+        image: '${{ matrix.classifier }}:${{ github.sha }}'
         fail-build: true
         severity-cutoff: high
     # - name: Echo Trivy SARIF results
