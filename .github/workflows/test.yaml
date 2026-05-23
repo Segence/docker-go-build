@@ -60,12 +60,9 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
       with:
         script: |
-          const output = `
-          #### Hadolint: \`${{ steps.hadolint.outcome }}\`
-          \`\`\`
-          ${process.env.HADOLINT_RESULTS}
-          \`\`\`
-          `;
+          const results = process.env.HADOLINT_RESULTS;
+          const resultsBlock = results ? `\n\`\`\`\n${results}\n\`\`\`` : '';
+          const output = `#### [Hadolint](https://hadolint.github.io/hadolint/) result: (\`${{ matrix.classifier }}\`): \`${{ steps.hadolint.outcome }}\`${resultsBlock}`;
 
           github.rest.issues.createComment({
             issue_number: context.issue.number,
