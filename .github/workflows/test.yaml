@@ -16,6 +16,7 @@ jobs:
       security-events: write   # ← THIS is what you're missing
       contents: read           # needed to check out code
       actions: read            # needed by some codeql internals
+      pull-requests: write
     steps:
     - uses: actions/checkout@v3
     - name: Lint Dockerfile
