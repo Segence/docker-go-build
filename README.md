@@ -1,8 +1,7 @@
 Go build Docker images
 ======================
 
-Kafka
-------
+## Kafka
 
 A Docker image containing:
 

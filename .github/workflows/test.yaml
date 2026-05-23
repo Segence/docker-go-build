@@ -11,7 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        classifier: [kafka]
+        classifier:
+        - kafka
+        - libpostal
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+      pull-requests: write
     steps:
     - uses: actions/checkout@v3
     - name: Lint Dockerfile
@@ -20,27 +27,42 @@ jobs:
       with:
         dockerfile: ./${{ matrix.classifier }}/Dockerfile
     - name: Build an image from Dockerfile
-      run: docker build --tag ${{ matrix.classifier }}:latest ./${{ matrix.classifier }}
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@v0.36.0
+      run: docker build --tag "${{ matrix.classifier }}:${{ github.sha }}" ./${{ matrix.classifier }}
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v4
       with:
-        image-ref: '${{ matrix.classifier }}:latest'
-        format: 'table'
-        exit-code: '1'
-        ignore-unfixed: true
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+    - name: Docker Scout
+      id: docker-scout
+      if: ${{ github.event_name == 'pull_request' }}
+      uses: docker/scout-action@v1
+      with:
+        command: sbom
+        image: ${{ matrix.classifier }}:${{ github.sha }}
+        to-env: production
+        format: spdx
+        output: "${{ matrix.classifier }}:${{ github.sha }}-sbom.spdx.json"
+    - name: Run Grype vulnerability scanner
+      uses: anchore/scan-action@v7
+      id: scan
+      with:
+        sbom: "${{ matrix.classifier }}:${{ github.sha }}-sbom.spdx.json"
+        fail-build: true
+        severity-cutoff: high
+    - name: Upload Grype scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v4
+      if: always()
+      with:
+        sarif_file: ${{ steps.scan.outputs.sarif }}
     - name: Update Pull Request
       uses: actions/github-script@v9
-      if: github.event_name == 'pull_request'
+      if: ${{ github.event_name == 'pull_request' }}
       with:
         script: |
-          const output = `
-          #### Hadolint: \`${{ steps.hadolint.outcome }}\`
-          \`\`\`
-          ${process.env.HADOLINT_RESULTS}
-          \`\`\`
-          `;
+          const results = process.env.HADOLINT_RESULTS;
+          const resultsBlock = results ? `\n\`\`\`\n${results}\n\`\`\`` : '';
+          const output = `#### [Hadolint](https://hadolint.github.io/hadolint/) result: (\`${{ matrix.classifier }}\`): \`${{ steps.hadolint.outcome }}\`${resultsBlock}`;
 
           github.rest.issues.createComment({
             issue_number: context.issue.number,
