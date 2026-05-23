@@ -35,7 +35,6 @@ jobs:
         password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
     - name: Docker Scout
       id: docker-scout
-      if: ${{ github.event_name == 'pull_request' }}
       uses: docker/scout-action@v1
       with:
         command: sbom
