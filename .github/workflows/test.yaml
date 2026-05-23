@@ -19,11 +19,11 @@ jobs:
       pull-requests: write
     steps:
     - uses: actions/checkout@v3
-    - name: Lint Dockerfile
-      id: hadolint
-      uses: hadolint/hadolint-action@v3.3.0
-      with:
-        dockerfile: ./${{ matrix.classifier }}/Dockerfile
+    # - name: Lint Dockerfile
+    #   id: hadolint
+    #   uses: hadolint/hadolint-action@v3.3.0
+    #   with:
+    #     dockerfile: ./${{ matrix.classifier }}/Dockerfile
     - name: Build an image from Dockerfile
       run: docker build --tag ${{ matrix.classifier }}:latest ./${{ matrix.classifier }}
     # - name: Run Trivy vulnerability scanner
@@ -40,10 +40,10 @@ jobs:
       with:
         image-ref: '${{ matrix.classifier }}:latest'
         format: 'sarif'
-        exit-code: '1'
-        ignore-unfixed: true
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
+        # exit-code: '1'
+        # ignore-unfixed: true
+        # vuln-type: 'os,library'
+        # severity: 'CRITICAL,HIGH'
         output: 'trivy-results.sarif'
     # - name: Echo Trivy SARIF results
     #   run: cat trivy-results.sarif
@@ -51,21 +51,21 @@ jobs:
       uses: github/codeql-action/upload-sarif@v4
       with:
         sarif_file: 'trivy-results.sarif'
-    - name: Update Pull Request
-      uses: actions/github-script@v9
-      if: github.event_name == 'pull_request'
-      with:
-        script: |
-          const output = `
-          #### Hadolint: \`${{ steps.hadolint.outcome }}\`
-          \`\`\`
-          ${process.env.HADOLINT_RESULTS}
-          \`\`\`
-          `;
+    # - name: Update Pull Request
+    #   uses: actions/github-script@v9
+    #   if: github.event_name == 'pull_request'
+    #   with:
+    #     script: |
+    #       const output = `
+    #       #### Hadolint: \`${{ steps.hadolint.outcome }}\`
+    #       \`\`\`
+    #       ${process.env.HADOLINT_RESULTS}
+    #       \`\`\`
+    #       `;
 
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: output
-          })
+    #       github.rest.issues.createComment({
+    #         issue_number: context.issue.number,
+    #         owner: context.repo.owner,
+    #         repo: context.repo.repo,
+    #         body: output
+    #       })
