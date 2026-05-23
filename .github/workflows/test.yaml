@@ -35,22 +35,19 @@ jobs:
     #     ignore-unfixed: true
     #     vuln-type: 'os,library'
     #     severity: 'CRITICAL,HIGH'
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@v0.36.0
+    - name: Run Grype vulnerability scanner
+      uses: anchore/scan-action@v7
+      id: scan
       with:
-        image-ref: '${{ matrix.classifier }}:latest'
-        format: 'sarif'
-        # exit-code: '1'
-        # ignore-unfixed: true
-        # vuln-type: 'os,library'
-        # severity: 'CRITICAL,HIGH'
-        output: 'trivy-results.sarif'
+        image: '${{ matrix.classifier }}:latest'
+        fail-build: true
+        severity-cutoff: high
     # - name: Echo Trivy SARIF results
     #   run: cat trivy-results.sarif
-    - name: Upload Trivy scan results to GitHub Security tab
+    - name: Upload Grype scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v4
       with:
-        sarif_file: 'trivy-results.sarif'
+        sarif_file: ${{ steps.scan.outputs.sarif }}
     # - name: Update Pull Request
     #   uses: actions/github-script@v9
     #   if: github.event_name == 'pull_request'
