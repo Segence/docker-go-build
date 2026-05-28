@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.8.0 - 2026-05-28
+#### Features
+- upgrade - (64b5fa1) - R Vadai
+
+- - -
+
 ## v0.7.0 - 2026-05-23
 #### Features
 - sbom - (d0a0b5a) - Rob Vadai
